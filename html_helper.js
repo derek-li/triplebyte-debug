@@ -72,7 +72,9 @@ function get_urls_from_page(paths_to_follow, url) {
         // has valid characters in it.
         const valid_section_regex = /^[a-zA-Z0-9.-_~!$&'()*+,;=@-]*$/;
 
-        const url_part_keys = ['protocol', 'hostname', 'path', 'query', 'hash'];
+        // Challenge 2: Removed the hash
+        // Reasoning: Hashes can have characters that would be illegal in other url parts.
+        const url_part_keys = ['protocol', 'hostname', 'path', 'query'];
         const invalid_url = url_part_keys.map(url_part_key => {
             return parsed_child_url[url_part_key] || '';
         }).filter(url_part => {

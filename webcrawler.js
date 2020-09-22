@@ -110,11 +110,16 @@ WebCrawler.prototype.url_should_be_crawled_as_node = function(url) {
     }
 
     // prevent you from starting to crawl FTP if you're looking at HTTP
-    if (parsed_url.protocol !== parsed_domain.protocol) {
+    // Challenge 4: Revised if statement
+    // Reasoning: If the domain and url have http and https protocols respectively, we'd expect to crawl the url as a node
+    // if (parsed_url.protocol !== parsed_domain.protocol) {
+    if (!(parsed_url.protocol.startsWith('http') && parsed_domain.protocol.startsWith('http'))) {
         return false;
     }
 
-    const filetype_list = ['pdf', 'jpg', 'gif', 'js', 'css', 'png'];
+    // Challenge 1: Added svg file type to list
+    // Reasoning: svg is a file type and not a node.
+    const filetype_list = ['pdf', 'jpg', 'gif', 'js', 'css', 'png', 'svg'];
 
     const split_url = url.split('.');
     if (filetype_list.indexOf(split_url[split_url.length - 1]) !== -1) {
@@ -224,8 +229,11 @@ WebCrawler.prototype._crawl_with_head_request = function(url) {
     });
 
     request.on('socket', socket => {
-        socket.setTimeout(1000);
+        socket.setTimeout(5000); // Changed from 1 to 5 seconds cause my internet is slow
         socket.on('timeout', () => {
+            // Challenge 3: Added line 236
+            // Reasoning: When we initiate an abort sequence, we still need to complete the current crawler and remove it from queue
+            this._finalize_crawl(url);
             request.abort();
         });
     });
